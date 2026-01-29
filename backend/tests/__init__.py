@@ -1,1 +1,1 @@
-# Tests for RAG chatbot components
+# Tests package for RAG system
