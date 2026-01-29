@@ -5,7 +5,13 @@ const API_URL = '/api';
 let currentSessionId = null;
 
 // DOM elements
-let chatMessages, chatInput, sendButton, totalCourses, courseTitles, newChatButton;
+let chatMessages, chatInput, sendButton, totalCourses, courseTitles, themeToggle;
+
+// Theme handling - runs immediately to prevent flash
+(function initTheme() {
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+})();
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
@@ -15,8 +21,8 @@ document.addEventListener('DOMContentLoaded', () => {
     sendButton = document.getElementById('sendButton');
     totalCourses = document.getElementById('totalCourses');
     courseTitles = document.getElementById('courseTitles');
-    newChatButton = document.getElementById('newChatButton');
-    
+    themeToggle = document.getElementById('themeToggle');
+
     setupEventListeners();
     createNewSession();
     loadCourseStats();
@@ -30,8 +36,14 @@ function setupEventListeners() {
         if (e.key === 'Enter') sendMessage();
     });
 
-    // New chat button
-    newChatButton.addEventListener('click', createNewSession);
+    // Theme toggle
+    themeToggle.addEventListener('click', toggleTheme);
+    themeToggle.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggleTheme();
+        }
+    });
 
     // Suggested questions
     document.querySelectorAll('.suggested-item').forEach(button => {
@@ -41,6 +53,21 @@ function setupEventListeners() {
             sendMessage();
         });
     });
+}
+
+// Theme toggle function
+function toggleTheme() {
+    const root = document.documentElement;
+    const currentTheme = root.getAttribute('data-theme');
+    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+
+    root.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+
+    // Update aria-label for accessibility
+    themeToggle.setAttribute('aria-label',
+        newTheme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'
+    );
 }
 
 
@@ -125,16 +152,10 @@ function addMessage(content, type, sources = null, isWelcome = false) {
     let html = `<div class="message-content">${displayContent}</div>`;
     
     if (sources && sources.length > 0) {
-        const sourceItems = sources.map(source => {
-            if (source.url) {
-                return `<li><a href="${escapeHtml(source.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(source.title)}</a></li>`;
-            }
-            return `<li>${escapeHtml(source.title)}</li>`;
-        }).join('');
         html += `
             <details class="sources-collapsible">
                 <summary class="sources-header">Sources</summary>
-                <ul class="sources-list">${sourceItems}</ul>
+                <div class="sources-content">${sources.join(', ')}</div>
             </details>
         `;
     }
