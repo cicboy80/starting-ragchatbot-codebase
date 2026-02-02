@@ -23,6 +23,7 @@ jobs:
       pull-requests: write
       issues: write
       checks: read
+      id-token: write
     steps:
       - name: Run Claude Code
         uses: anthropics/claude-code-action@v1
