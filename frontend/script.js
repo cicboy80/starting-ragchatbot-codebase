@@ -5,7 +5,7 @@ const API_URL = '/api';
 let currentSessionId = null;
 
 // DOM elements
-let chatMessages, chatInput, sendButton, totalCourses, courseTitles, themeToggle;
+let chatMessages, chatInput, sendButton, totalCourses, courseTitles, themeToggle, newChatButton;
 
 // Theme handling - runs immediately to prevent flash
 (function initTheme() {
@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
     totalCourses = document.getElementById('totalCourses');
     courseTitles = document.getElementById('courseTitles');
     themeToggle = document.getElementById('themeToggle');
+    newChatButton = document.getElementById('newChatButton');
 
     setupEventListeners();
     createNewSession();
@@ -44,6 +45,9 @@ function setupEventListeners() {
             toggleTheme();
         }
     });
+
+    // New chat button
+    newChatButton.addEventListener('click', createNewSession);
 
     // Suggested questions
     document.querySelectorAll('.suggested-item').forEach(button => {
